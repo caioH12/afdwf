@@ -3,45 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Protótipo MOBA</title>
+    <title>Jogo de Futebol Simples</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            overflow: hidden;
             background-color: #2c3e50;
         }
         .game-container {
             position: relative;
-            width: 100vw;
-            height: 100vh;
-            background-color: #34495e;
+            width: 800px;
+            height: 400px;
+            margin: 50px auto;
+            background-color: #27ae60;
+            border: 5px solid #fff;
+            overflow: hidden;
         }
-        .champion {
+        .player {
             position: absolute;
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             background-color: #ecf0f1;
             border-radius: 50%;
         }
-        #champion1 {
+        #player1 {
             background-color: #e74c3c; /* Vermelho */
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
         }
-        #champion2 {
+        #player2 {
             background-color: #3498db; /* Azul */
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
         }
-        .health-bar {
+        .ball {
             position: absolute;
-            width: 50px;
-            height: 5px;
-            background-color: #27ae60;
-            top: 55px;
-        }
-        #health1 {
-            background-color: #e74c3c;
-        }
-        #health2 {
-            background-color: #3498db;
+            width: 20px;
+            height: 20px;
+            background-color: #fff;
+            border-radius: 50%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
         }
         .instructions {
             position: absolute;
@@ -55,101 +60,67 @@
 </head>
 <body>
     <div class="game-container">
-        <div class="instructions">Movimente com WASD (Jogador 1) e as setas (Jogador 2). Ataque com a barra de espaço.</div>
-        <div id="champion1" class="champion"></div>
-        <div id="champion2" class="champion"></div>
-        <div id="health1" class="health-bar"></div>
-        <div id="health2" class="health-bar"></div>
+        <div class="instructions">Movimente com WASD (Jogador 1) e as setas (Jogador 2). Chute com a barra de espaço.</div>
+        <div id="player1" class="player"></div>
+        <div id="player2" class="player"></div>
+        <div id="ball" class="ball"></div>
     </div>
 
     <script>
-        const champ1 = document.getElementById('champion1');
-        const champ2 = document.getElementById('champion2');
-        const health1 = document.getElementById('health1');
-        const health2 = document.getElementById('health2');
-
+        const player1 = document.getElementById('player1');
+        const player2 = document.getElementById('player2');
+        const ball = document.getElementById('ball');
         const moveSpeed = 5;
-        let champ1Health = 100;
-        let champ2Health = 100;
+        const ballSpeed = 3;
 
-        // Função para mover os campeões
-        function moveChampion(champion, dx, dy) {
-            const rect = champion.getBoundingClientRect();
+        let ballVelocityX = 0;
+        let ballVelocityY = 0;
+
+        // Move os jogadores
+        function movePlayer(player, dx, dy) {
+            const rect = player.getBoundingClientRect();
             const containerRect = document.querySelector('.game-container').getBoundingClientRect();
-            
+
             let newX = rect.left + dx;
             let newY = rect.top + dy;
 
-            // Verifica limites da área do jogo
             newX = Math.max(containerRect.left, Math.min(newX, containerRect.right - rect.width));
             newY = Math.max(containerRect.top, Math.min(newY, containerRect.bottom - rect.height));
 
-            champion.style.left = `${newX - containerRect.left}px`;
-            champion.style.top = `${newY - containerRect.top}px`;
+            player.style.left = `${newX - containerRect.left}px`;
+            player.style.top = `${newY - containerRect.top}px`;
         }
 
-        // Atualiza a saúde
-        function updateHealth() {
-            health1.style.width = `${champ1Health}%`;
-            health2.style.width = `${champ2Health}%`;
+        // Move a bola
+        function moveBall() {
+            const ballRect = ball.getBoundingClientRect();
+            const containerRect = document.querySelector('.game-container').getBoundingClientRect();
+
+            let newLeft = ballRect.left + ballVelocityX;
+            let newTop = ballRect.top + ballVelocityY;
+
+            // Verifica colisões com as bordas do campo
+            if (newLeft <= containerRect.left || newLeft + ballRect.width >= containerRect.right) {
+                ballVelocityX *= -1;
+            }
+            if (newTop <= containerRect.top || newTop + ballRect.height >= containerRect.bottom) {
+                ballVelocityY *= -1;
+            }
+
+            ball.style.left = `${newLeft - containerRect.left}px`;
+            ball.style.top = `${newTop - containerRect.top}px`;
+
+            // Verifica colisões com os jogadores
+            if (checkCollision(ball, player1) || checkCollision(ball, player2)) {
+                ballVelocityX *= -1;
+                ballVelocityY *= -1;
+            }
         }
 
-        // Movimenta o campeão 1 (WASD)
-        document.addEventListener('keydown', function(event) {
-            switch(event.key) {
-                case 'w':
-                    moveChampion(champ1, 0, -moveSpeed);
-                    break;
-                case 's':
-                    moveChampion(champ1, 0, moveSpeed);
-                    break;
-                case 'a':
-                    moveChampion(champ1, -moveSpeed, 0);
-                    break;
-                case 'd':
-                    moveChampion(champ1, moveSpeed, 0);
-                    break;
-                case ' ':
-                    // Ataque
-                    if (checkCollision(champ1, champ2)) {
-                        champ2Health -= 10;
-                        if (champ2Health <= 0) champ2Health = 0;
-                        updateHealth();
-                    }
-                    break;
-            }
-        });
-
-        // Movimenta o campeão 2 (setas)
-        document.addEventListener('keydown', function(event) {
-            switch(event.key) {
-                case 'ArrowUp':
-                    moveChampion(champ2, 0, -moveSpeed);
-                    break;
-                case 'ArrowDown':
-                    moveChampion(champ2, 0, moveSpeed);
-                    break;
-                case 'ArrowLeft':
-                    moveChampion(champ2, -moveSpeed, 0);
-                    break;
-                case 'ArrowRight':
-                    moveChampion(champ2, moveSpeed, 0);
-                    break;
-                case 'Enter':
-                    // Ataque
-                    if (checkCollision(champ2, champ1)) {
-                        champ1Health -= 10;
-                        if (champ1Health <= 0) champ1Health = 0;
-                        updateHealth();
-                    }
-                    break;
-            }
-        });
-
-        // Verifica colisão entre campeões
-        function checkCollision(champ1, champ2) {
-            const rect1 = champ1.getBoundingClientRect();
-            const rect2 = champ2.getBoundingClientRect();
+        // Verifica colisão entre dois elementos
+        function checkCollision(el1, el2) {
+            const rect1 = el1.getBoundingClientRect();
+            const rect2 = el2.getBoundingClientRect();
 
             return !(rect1.right < rect2.left || 
                      rect1.left > rect2.right || 
@@ -157,7 +128,53 @@
                      rect1.top > rect2.bottom);
         }
 
-        updateHealth(); // Inicializa a saúde
+        // Movimenta o jogador 1 (WASD)
+        document.addEventListener('keydown', function(event) {
+            switch(event.key) {
+                case 'w':
+                    movePlayer(player1, 0, -moveSpeed);
+                    break;
+                case 's':
+                    movePlayer(player1, 0, moveSpeed);
+                    break;
+                case 'a':
+                    movePlayer(player1, -moveSpeed, 0);
+                    break;
+                case 'd':
+                    movePlayer(player1, moveSpeed, 0);
+                    break;
+                case ' ':
+                    ballVelocityX = ballSpeed * (Math.random() > 0.5 ? 1 : -1);
+                    ballVelocityY = ballSpeed * (Math.random() > 0.5 ? 1 : -1);
+                    break;
+            }
+        });
+
+        // Movimenta o jogador 2 (setas)
+        document.addEventListener('keydown', function(event) {
+            switch(event.key) {
+                case 'ArrowUp':
+                    movePlayer(player2, 0, -moveSpeed);
+                    break;
+                case 'ArrowDown':
+                    movePlayer(player2, 0, moveSpeed);
+                    break;
+                case 'ArrowLeft':
+                    movePlayer(player2, -moveSpeed, 0);
+                    break;
+                case 'ArrowRight':
+                    movePlayer(player2, moveSpeed, 0);
+                    break;
+            }
+        });
+
+        // Atualiza a posição da bola continuamente
+        function gameLoop() {
+            moveBall();
+            requestAnimationFrame(gameLoop);
+        }
+
+        gameLoop(); // Inicia o loop do jogo
     </script>
 </body>
 </html>
