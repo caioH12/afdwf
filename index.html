@@ -3,135 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulário de Cadastro</title>
+    <title>Mini Jogo de Corrida de Aviões</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
+            padding: 0;
+            background-color: #87CEEB; /* Azul claro para o céu */
+            overflow: hidden;
         }
-        .form-container {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
+        .game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: #87CEEB;
+            overflow: hidden;
         }
-        h2 {
-            margin-top: 0;
+        .plane {
+            position: absolute;
+            width: 50px;
+            height: 30px;
+            background: url('https://via.placeholder.com/50x30') no-repeat center center;
+            background-size: contain;
         }
-        .form-group {
-            margin-bottom: 15px;
+        .finish-line {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 10px;
+            height: 100%;
+            background-color: red;
         }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        .form-group textarea {
-            resize: vertical;
-        }
-        .form-group button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .form-group button:hover {
-            background-color: #0056b3;
-        }
-        .error {
-            color: red;
-            font-size: 14px;
-            margin-top: 5px;
+        .instructions {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 18px;
+            color: white;
+            font-family: Arial, sans-serif;
         }
     </style>
 </head>
 <body>
-    <div class="form-container">
-        <h2>Realização de Cadastro</h2>
-        <form id="contactForm">
-            <div class="form-group">
-                <label for="name">Nome:</label>
-                <input type="text" id="name" name="name" required>
-                <div id="nameError" class="error"></div>
-            </div>
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-                <div id="emailError" class="error"></div>
-            </div>
-            <div class="form-group">
-                <label for="message">Mensagem:</label>
-                <textarea id="message" name="message" rows="4" required></textarea>
-                <div id="messageError" class="error"></div>
-            </div>
-            <div class="form-group">
-                <button type="submit">Enviar</button>
-            </div>
-        </form>
+    <div class="game-container">
+        <div class="instructions">Use as setas do teclado para mover o avião!</div>
+        <div class="plane" id="plane"></div>
+        <div class="finish-line"></div>
     </div>
 
     <script>
-        document.getElementById('contactForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+        const plane = document.getElementById('plane');
+        const finishLine = document.querySelector('.finish-line');
+        let planeX = 0;
+        let planeY = 0;
+        const planeSpeed = 10; // Velocidade do avião
 
-            // Clear previous errors
-            document.getElementById('nameError').textContent = '';
-            document.getElementById('emailError').textContent = '';
-            document.getElementById('messageError').textContent = '';
+        // Atualiza a posição do avião
+        function updatePlanePosition() {
+            plane.style.left = `${planeX}px`;
+            plane.style.top = `${planeY}px`;
+        }
 
-            // Get form values
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const message = document.getElementById('message').value.trim();
+        // Verifica se o avião cruzou a linha de chegada
+        function checkFinish() {
+            const planeRect = plane.getBoundingClientRect();
+            const finishRect = finishLine.getBoundingClientRect();
 
-            let hasError = false;
-
-            // Validate name
-            if (name === '') {
-                document.getElementById('nameError').textContent = 'O nome é obrigatório.';
-                hasError = true;
+            if (planeRect.left + planeRect.width > finishRect.left) {
+                alert('Parabéns! Você completou a corrida!');
+                resetGame();
             }
+        }
 
-            // Validate email
-            if (email === '') {
-                document.getElementById('emailError').textContent = 'O email é obrigatório.';
-                hasError = true;
-            } else if (!/\S+@\S+\.\S+/.test(email)) {
-                document.getElementById('emailError').textContent = 'O email deve ser válido.';
-                hasError = true;
-            }
+        // Reseta o jogo
+        function resetGame() {
+            planeX = 0;
+            planeY = 0;
+            updatePlanePosition();
+        }
 
-            // Validate message
-            if (message === '') {
-                document.getElementById('messageError').textContent = 'A mensagem é obrigatória.';
-                hasError = true;
+        // Controla o movimento do avião com as teclas de seta
+        document.addEventListener('keydown', function(event) {
+            switch(event.key) {
+                case 'ArrowUp':
+                    planeY -= planeSpeed;
+                    break;
+                case 'ArrowDown':
+                    planeY += planeSpeed;
+                    break;
+                case 'ArrowLeft':
+                    planeX -= planeSpeed;
+                    break;
+                case 'ArrowRight':
+                    planeX += planeSpeed;
+                    break;
             }
-
-            // If no errors, submit form
-            if (!hasError) {
-                alert('Formulário enviado com sucesso!');
-                // Aqui você pode fazer um AJAX request ou algo similar
-                // Para este exemplo, apenas limpa o formulário
-                document.getElementById('contactForm').reset();
-            }
+            updatePlanePosition();
+            checkFinish();
         });
+
+        resetGame(); // Inicia o jogo
     </script>
 </body>
 </html>
