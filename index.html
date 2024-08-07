@@ -3,47 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulário de Exemplo</title>
+    <title>Formulário de Contato</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
         }
+
         .form-container {
-            background: #fff;
+            background-color: #fff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 400px;
+            max-width: 600px;
         }
-        h2 {
-            margin-top: 0;
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
-        .form-group label {
+
+        label {
             display: block;
             margin-bottom: 5px;
+            font-weight: bold;
         }
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
+
+        input[type="text"],
+        input[type="tel"],
+        input[type="email"],
+        textarea {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
+            padding: 10px;
+            border: 1px solid #ddd;
             border-radius: 4px;
+            box-sizing: border-box;
         }
-        .form-group textarea {
-            resize: vertical;
-        }
-        .form-group button {
+
+        button {
             background-color: #007bff;
             color: #fff;
             border: none;
@@ -52,85 +61,67 @@
             cursor: pointer;
             font-size: 16px;
         }
-        .form-group button:hover {
+
+        button:hover {
             background-color: #0056b3;
-        }
-        .error {
-            color: red;
-            font-size: 14px;
-            margin-top: 5px;
         }
     </style>
 </head>
 <body>
     <div class="form-container">
-        <h2>Formulário de Contato</h2>
+        <h1>Formulário de Contato</h1>
         <form id="contactForm">
             <div class="form-group">
                 <label for="name">Nome:</label>
                 <input type="text" id="name" name="name" required>
-                <div id="nameError" class="error"></div>
+            </div>
+            <div class="form-group">
+                <label for="phone">Telefone:</label>
+                <input type="tel" id="phone" name="phone" required>
             </div>
             <div class="form-group">
                 <label for="email">Email:</label>
                 <input type="email" id="email" name="email" required>
-                <div id="emailError" class="error"></div>
             </div>
             <div class="form-group">
-                <label for="message">Mensagem:</label>
-                <textarea id="message" name="message" rows="4" required></textarea>
-                <div id="messageError" class="error"></div>
+                <label for="description">Descrição:</label>
+                <textarea id="description" name="description" rows="4" required></textarea>
             </div>
             <div class="form-group">
-                <button type="submit">Enviar</button>
+                <label for="address">Endereço:</label>
+                <input type="text" id="address" name="address" required>
             </div>
+            <button type="submit">Enviar</button>
         </form>
     </div>
 
     <script>
         document.getElementById('contactForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+            event.preventDefault(); // Evita o envio do formulário
 
-            // Clear previous errors
-            document.getElementById('nameError').textContent = '';
-            document.getElementById('emailError').textContent = '';
-            document.getElementById('messageError').textContent = '';
+            // Coleta os valores dos campos
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+            const description = document.getElementById('description').value;
+            const address = document.getElementById('address').value;
 
-            // Get form values
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const message = document.getElementById('message').value.trim();
-
-            let hasError = false;
-
-            // Validate name
-            if (name === '') {
-                document.getElementById('nameError').textContent = 'O nome é obrigatório.';
-                hasError = true;
+            // Validação básica
+            if (!name || !phone || !email || !description || !address) {
+                alert('Por favor, preencha todos os campos.');
+                return;
             }
 
-            // Validate email
-            if (email === '') {
-                document.getElementById('emailError').textContent = 'O email é obrigatório.';
-                hasError = true;
-            } else if (!/\S+@\S+\.\S+/.test(email)) {
-                document.getElementById('emailError').textContent = 'O email deve ser válido.';
-                hasError = true;
-            }
+            // Exibe os dados do formulário (ou você pode enviar para um servidor)
+            alert(`Dados enviados:
+            Nome: ${name}
+            Telefone: ${phone}
+            Email: ${email}
+            Descrição: ${description}
+            Endereço: ${address}`);
 
-            // Validate message
-            if (message === '') {
-                document.getElementById('messageError').textContent = 'A mensagem é obrigatória.';
-                hasError = true;
-            }
-
-            // If no errors, submit form
-            if (!hasError) {
-                alert('Formulário enviado com sucesso!');
-                // Aqui você pode fazer um AJAX request ou algo similar
-                // Para este exemplo, apenas limpa o formulário
-                document.getElementById('contactForm').reset();
-            }
+            // Limpa o formulário
+            document.getElementById('contactForm').reset();
         });
     </script>
 </body>
