@@ -3,113 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Venda de Aviões</title>
+    <title>Formulário de Exemplo</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f0f0;
-        }
-        header {
-            background-color: #007bff;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 20px auto;
+            background-color: #f4f4f4;
             display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-        .plane-card {
-            background-color: white;
+        .form-container {
+            background: #fff;
+            padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: calc(33.333% - 20px);
-            box-sizing: border-box;
-            overflow: hidden;
-        }
-        .plane-card img {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 100%;
-            height: 200px;
-            object-fit: cover;
+            max-width: 400px;
         }
-        .plane-card .details {
-            padding: 15px;
+        h2 {
+            margin-top: 0;
         }
-        .plane-card h2 {
-            margin: 0 0 10px;
-        }
-        .plane-card p {
-            margin: 0 0 15px;
-        }
-        .plane-card .price {
-            font-size: 20px;
-            color: #007bff;
+        .form-group {
             margin-bottom: 15px;
         }
-        .plane-card button {
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-group textarea {
+            resize: vertical;
+        }
+        .form-group button {
             background-color: #007bff;
-            color: white;
+            color: #fff;
             border: none;
-            padding: 10px;
+            padding: 10px 15px;
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
         }
-        .plane-card button:hover {
+        .form-group button:hover {
             background-color: #0056b3;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Venda de Aviões</h1>
-    </header>
-
-    <div class="container">
-        <!-- Avião 1 -->
-        <div class="plane-card">
-            <img src="https://via.placeholder.com/600x400" alt="Avião 1">
-            <div class="details">
-                <h2>Avião SuperJet 500</h2>
-                <p>Um jato executivo de alta performance com capacidade para 8 passageiros. Ideal para viagens internacionais.</p>
-                <div class="price">R$ 20.000.000</div>
-                <button onclick="buyPlane('Avião SuperJet 500')">Comprar</button>
+    <div class="form-container">
+        <h2>Formulário de Contato</h2>
+        <form id="contactForm">
+            <div class="form-group">
+                <label for="name">Nome:</label>
+                <input type="text" id="name" name="name" required>
+                <div id="nameError" class="error"></div>
             </div>
-        </div>
-
-        <!-- Avião 2 -->
-        <div class="plane-card">
-            <img src="https://via.placeholder.com/600x400" alt="Avião 2">
-            <div class="details">
-                <h2>Avião Cargo XL</h2>
-                <p>O Avião Cargo XL é perfeito para transporte de grandes cargas. Capacidade de carga de 50 toneladas.</p>
-                <div class="price">R$ 15.000.000</div>
-                <button onclick="buyPlane('Avião Cargo XL')">Comprar</button>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                <div id="emailError" class="error"></div>
             </div>
-        </div>
-
-        <!-- Avião 3 -->
-        <div class="plane-card">
-            <img src="https://via.placeholder.com/600x400" alt="Avião 3">
-            <div class="details">
-                <h2>Avião de Passeio SkyDreamer</h2>
-                <p>Ideal para viagens de lazer com capacidade para 4 passageiros. Equipado com a mais moderna tecnologia.</p>
-                <div class="price">R$ 5.000.000</div>
-                <button onclick="buyPlane('Avião de Passeio SkyDreamer')">Comprar</button>
+            <div class="form-group">
+                <label for="message">Mensagem:</label>
+                <textarea id="message" name="message" rows="4" required></textarea>
+                <div id="messageError" class="error"></div>
             </div>
-        </div>
+            <div class="form-group">
+                <button type="submit">Enviar</button>
+            </div>
+        </form>
     </div>
 
     <script>
-        function buyPlane(planeName) {
-            alert('Você selecionou o ' + planeName + '. Entre em contato para mais informações.');
-        }
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Clear previous errors
+            document.getElementById('nameError').textContent = '';
+            document.getElementById('emailError').textContent = '';
+            document.getElementById('messageError').textContent = '';
+
+            // Get form values
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const message = document.getElementById('message').value.trim();
+
+            let hasError = false;
+
+            // Validate name
+            if (name === '') {
+                document.getElementById('nameError').textContent = 'O nome é obrigatório.';
+                hasError = true;
+            }
+
+            // Validate email
+            if (email === '') {
+                document.getElementById('emailError').textContent = 'O email é obrigatório.';
+                hasError = true;
+            } else if (!/\S+@\S+\.\S+/.test(email)) {
+                document.getElementById('emailError').textContent = 'O email deve ser válido.';
+                hasError = true;
+            }
+
+            // Validate message
+            if (message === '') {
+                document.getElementById('messageError').textContent = 'A mensagem é obrigatória.';
+                hasError = true;
+            }
+
+            // If no errors, submit form
+            if (!hasError) {
+                alert('Formulário enviado com sucesso!');
+                // Aqui você pode fazer um AJAX request ou algo similar
+                // Para este exemplo, apenas limpa o formulário
+                document.getElementById('contactForm').reset();
+            }
+        });
     </script>
 </body>
 </html>
